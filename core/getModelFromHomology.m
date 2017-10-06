@@ -45,7 +45,7 @@ function draftModel=getModelFromHomology(models,blastStructure,getModelFor,prefe
 %
 %   draftModel        a new model structure
 %
-%   Simonas Marcisauskas, 2017-08-25
+%   Eduard Kerkhoven, 2017-10-06
 %
 
 %NOTE: "to" and "from" means relative the new organism
@@ -124,10 +124,11 @@ for i=1:numel(models)
 end
 
 %Remove all genes from the blast structure that have no genes in the models
+%geneShortNames contains the gene names in format that matches FASTA used in BLAST
 if onlyGenesInModels==true
     modelGenes={};
     for i=1:numel(models)
-        modelGenes=[modelGenes;models{i}.genes];
+        modelGenes=[modelGenes;models{i}.geneShortNames];
     end
     for i=1:numel(blastStructure)
         %Check to see if it should match the toId or fromId
@@ -266,7 +267,7 @@ usedNewGenes=false(numel(allGenes{1}),1);
 for i=1:numel(allGenes)-1
     %First remove mappings for those genes that are not in the model
     if onlyGenesInModels==false
-        a=ismember(allGenes{i+1},models{useOrderIndexes(i)}.genes);
+        a=ismember(allGenes{i+1},models{useOrderIndexes(i)}.geneShortNames);
         finalMappings{i}(:,~a)=false;
     end
 
@@ -296,7 +297,7 @@ end
 %present in the grRules
 
 for i=1:numel(models)
-    a=ismember(models{useOrderIndexes(i)}.genes,allGenes{i+1});
+    a=ismember(models{useOrderIndexes(i)}.geneShortNames,allGenes{i+1});
 
     %Don't remove reactions with complexes if not all genes in the complex
     %should be deleted.
@@ -348,7 +349,7 @@ for i=1:numel(models)
     %Create a new gene list with the genes from the new organism and those
     %genes that could not be removed
     replaceableGenes=allGenes{i+1}(unique(oldGenes));
-    nonReplaceableGenes=setdiff(models{useOrderIndexes(i)}.genes,replaceableGenes);
+    nonReplaceableGenes=setdiff(models{useOrderIndexes(i)}.geneShortNames,replaceableGenes);
     fullGeneList=[allGenes{1}(unique(newGenes));nonReplaceableGenes];
 
     %Just to save some indexing later. This is the LAST index of
@@ -372,7 +373,7 @@ for i=1:numel(models)
             %match. Could probably be done better, but I'm a little lost in
             %the indexing
 
-            geneName=models{useOrderIndexes(i)}.genes(oldGeneIds(k));
+            geneName=models{useOrderIndexes(i)}.geneShortNames(oldGeneIds(k));
 
             %First search in the mappable genes
             mapIndex=find(ismember(allGenes{i+1},geneName));
@@ -412,13 +413,13 @@ for i=1:numel(models)
     %Add the new list of genes
     models{useOrderIndexes(i)}.rxnGeneMat=newRxnGeneMat;
     if ~isempty(nonReplaceableGenes)
-        models{useOrderIndexes(i)}.genes=[allGenes{1}(unique(newGenes));strcat('OLD_',models{useOrderIndexes(i)}.id,'_',nonReplaceableGenes)];
+        models{useOrderIndexes(i)}.geneShortNames=[allGenes{1}(unique(newGenes));strcat('OLD_',models{useOrderIndexes(i)}.id,'_',nonReplaceableGenes)];
     else
-        models{useOrderIndexes(i)}.genes=allGenes{1}(unique(newGenes));
+        models{useOrderIndexes(i)}.geneShortNames=allGenes{1}(unique(newGenes));
     end
     if isfield(models{useOrderIndexes(i)},'geneComps')
         geneComps=models{useOrderIndexes(i)}.geneComps(1);
-        models{useOrderIndexes(i)}.geneComps=zeros(numel(models{useOrderIndexes(i)}.genes),1);
+        models{useOrderIndexes(i)}.geneComps=zeros(numel(models{useOrderIndexes(i)}.geneShortNames),1);
         % Assume that all genes are in the same compartment, and this
         % compartment is specified for the first gene
         models{useOrderIndexes(i)}.geneComps(:)=geneComps;

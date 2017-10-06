@@ -862,9 +862,11 @@ if all(cellfun(@isempty,geneShortNames))
             elseif ~isempty(modelSBML.fbc_geneProduct(i).fbc_label)
                 geneShortNames{i,1}=modelSBML.fbc_geneProduct(i).fbc_label;
             else
-                geneShortNames{i,1}='';
+                geneShortNames{i,1}=genes(i,1);
             end;
         end;
+    else
+        geneShortNames=genes;
     end;
 end;
 

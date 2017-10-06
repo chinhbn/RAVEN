@@ -20,7 +20,7 @@ function [reducedModel,notDeleted]=removeGenes(model,genesToRemove, removeUnused
 %   Usage: [reducedModel,notDeleted]=removeGenes(model,genesToRemove,
 %           removeUnusedMets, removeRxnsWithComplexes)
 %
-%   Rasmus Agren, 2014-01-08
+%   Eduard Kerkhoven, 2017-10-06
 %
 
 if nargin<3
@@ -70,7 +70,7 @@ if ~isempty(genesToRemove)
             %reactions to be deleted
             [~, geneIndexes]=find(reducedModel.rxnGeneMat(a(rxnsToRemove),:));
             if ~isempty(setdiff(indexesToDelete,geneIndexes))
-                notDeleted=reducedModel.genes(setdiff(indexesToDelete,geneIndexes));
+                notDeleted=reducedModel.geneShortNames(setdiff(indexesToDelete,geneIndexes));
             end
 
             %Delete the reactions
